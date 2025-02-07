@@ -1,19 +1,40 @@
+const { where } = require("sequelize")
+
 class UserRepository {
-    constructor(userModel) {
-        this.userModel = userModel
-    }
+  constructor(userModel) {
+    this.userModel = userModel
+  }
 
-    async findAll() {
-        return await this.userModel.findAll()
-    }
+  async findAll() {
+    return await this.userModel.findAll()
+  }
 
-    async findUserById(id) {
-        return await this.userModel.findByPk(id)
-    }
+  async findUserById(id) {
+    return await this.userModel.findByPk(id)
+  }
 
-    async createUser(userData) {
-        return await this.userModel.create(userData)
-    }
+  async createUser(userData) {
+    return await this.userModel.create(userData)
+  }
+
+  async updateUser(id, userData) {
+    return await this.userModel.update(userData,
+      {
+        where: {
+          id
+        },
+        returning: true
+      }
+    )
+  }
+
+  async deleteUser(id) {
+    return await this.userModel.destroy({
+      where: {
+        id
+      }
+    })
+  }
 }
 
 module.exports = UserRepository
