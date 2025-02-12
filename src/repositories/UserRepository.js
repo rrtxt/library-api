@@ -1,24 +1,30 @@
-const { where } = require("sequelize")
+const { User } = require("../../User")
+const { default: NotFoundException } = require("../exceptions/NotFoundException")
 
 class UserRepository {
-  constructor(userModel) {
-    this.userModel = userModel
+  constructor() {
+    this.userModel = User
   }
 
-  async findAll() {
+  static async findAll() {
     return await this.userModel.findAll()
   }
 
-  async findUserById(id) {
-    return await this.userModel.findByPk(id)
+  static async findUserById(id) {
+    const user = await this.userModel.findByPk(id)
+    if (!user) {
+      throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
+    }
+
+    return user
   }
 
-  async createUser(userData) {
+  static async createUser(userData) {
     return await this.userModel.create(userData)
   }
 
-  async updateUser(id, userData) {
-    return await this.userModel.update(userData,
+  static async updateUser(id, userData) {
+    const user = await this.userModel.update(userData,
       {
         where: {
           id
@@ -26,14 +32,25 @@ class UserRepository {
         returning: true
       }
     )
+
+    if (!user) {
+      throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
+    }
+
+    return user
   }
 
-  async deleteUser(id) {
-    return await this.userModel.destroy({
+  static async deleteUser(id) {
+    const deletedUserId = await this.userModel.destroy({
       where: {
         id
-      }
+      },
     })
+
+    if (!deletedUserId) {
+      throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
+    }
+    return deletedUserId
   }
 }
 

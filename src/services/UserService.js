@@ -1,32 +1,28 @@
-class UserService {
-  constructor(userRepository) {
-    this.userRepository = userRepository
-  }
+const { default: UserValidation } = require("../validators/userValidator")
+const { default: ZodValidator } = require("../validators/zodValidator")
 
-  async getUsers() {
+class UserService {
+  static async getUsers() {
     return await this.userRepository.findAll()
   }
 
-  async getUserById(id) {
+  static async getUserById(id) {
     return await this.userRepository.findUserById(id)
   }
 
-  async registerUser(userData) {
-    return await this.userRepository.createUser(userData)
+  static async registerUser(userData) {
+    user = ZodValidator.validate(UserValidation.CREATE, userData)
+    return await this.userRepository.createUser(user)
   }
 
-  async updateUserById(id, userData) {
-    const user = await this.getUserById(id)
-    if (!user) throw new Error("User nor found")
+  static async updateUserById(id, userData) {
+    user = ZodValidator.validate(UserValidation.UPDATE, userData)
 
-    const updatedData = await this.userRepository.updateUser(id, userData)
+    const updatedData = await this.userRepository.updateUser(id, user)
     return updatedData[1]
   }
 
-  async deleteUserById(id) {
-    const user = await this.getUserById(id)
-    if (!user) throw new Error("User Not Found")
-
+  static async deleteUserById(id) {
     return await this.userRepository.deleteUser(id)
   }
 }
