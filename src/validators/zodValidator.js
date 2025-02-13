@@ -1,5 +1,7 @@
-export default class ZodValidator {
+class ZodValidator {
   static validate(schema, objectValidate) {
-    return schema.parse(objectValidatec)
+    return schema.parse(objectValidate)
   }
 }
+
+module.exports = ZodValidator

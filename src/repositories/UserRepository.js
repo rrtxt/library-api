@@ -1,17 +1,13 @@
-const { User } = require("../../User")
-const { default: NotFoundException } = require("../exceptions/NotFoundException")
+const { User } = require("../../models")
+const NotFoundException = require("../exceptions/NotFoundException")
 
 class UserRepository {
-  constructor() {
-    this.userModel = User
-  }
-
   static async findAll() {
-    return await this.userModel.findAll()
+    return await User.findAll()
   }
 
   static async findUserById(id) {
-    const user = await this.userModel.findByPk(id)
+    const user = await User.findByPk(id)
     if (!user) {
       throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
     }
@@ -20,11 +16,11 @@ class UserRepository {
   }
 
   static async createUser(userData) {
-    return await this.userModel.create(userData)
+    return await User.create(userData)
   }
 
   static async updateUser(id, userData) {
-    const user = await this.userModel.update(userData,
+    const [affectedRow, updatedRow] = await User.update(userData,
       {
         where: {
           id
@@ -33,24 +29,25 @@ class UserRepository {
       }
     )
 
-    if (!user) {
+    if (affectedRow === 0) {
       throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
     }
 
-    return user
+    return updatedRow[0]
   }
 
   static async deleteUser(id) {
-    const deletedUserId = await this.userModel.destroy({
+    const deletedCount = await User.destroy({
       where: {
         id
       },
     })
 
-    if (!deletedUserId) {
+    if (deletedCount === 0) {
       throw new NotFoundException(`user dengan id ${id} tidak ditemukan`)
     }
-    return deletedUserId
+
+    return deletedCount
   }
 }
 

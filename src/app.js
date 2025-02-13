@@ -1,31 +1,30 @@
 const express = require('express')
 const app = express()
 const db = require('../models')
-// const UserController = require('./controllers/UserController')
+const userRoutes = require('./routes/UserRoute')
+const errorMiddleware = require('./middlewares/errorMiddleware')
 const port = 3000
-// const userController = new UserController()
 
-
-// Router
-const userRouter = require('./routes/UserRoute')
-app.use(express.json())
-
-try {
+const startServer = async () => {
+  try {
     app.get('/', (req, res) => {
-        res.send('hello world')
+      res.send('hello world')
     })
 
-    // app.get('/users', userController.getAlUsers)
+    // Router
+    app.use(express.json())
+    app.use(userRoutes)
+    app.use(errorMiddleware)
 
-    app.use('/', userRouter)
+    await db.sequelize.sync()
+    console.log('Database Synced')
 
-    db.sequelize.sync().then((res) => {
-        console.log('Database synced');
-        app.listen(port, () => {
-            console.log('server running at:', port);
-        })
+    app.listen(port, () => {
+      console.log('Server running at:', port)
     })
-
-} catch (err) {
-    console.error('Error syncing database:', err);
+  } catch (err) {
+    console.error('Error running server:', err);
+  }
 }
+
+startServer()

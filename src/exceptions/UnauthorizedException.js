@@ -1,7 +1,9 @@
-export default class UnauthorizedException extends Error {
+class UnauthorizedException extends Error {
   constructor(message) {
-    super()
+    super(message)
     this.message = message
     this.status = 403
   }
 }
+
+module.exports = UnauthorizedException
